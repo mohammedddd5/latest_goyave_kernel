@@ -44,11 +44,11 @@
 #define GR_MPLL_REFIN_SHIFT     16
 #define GR_MPLL_REFIN_MASK      (0x3)
 #define GR_MPLL_N_MASK          (0x7ff)
-#define GR_MPLL_MN		(REG_GLB_M_PLL_CTL0)
-#define GR_GEN1			(REG_GLB_GEN1)
+#define GR_MPLL_MN              (REG_GLB_M_PLL_CTL0)
+#define GR_GEN1                 (REG_GLB_GEN1)
 #endif
 
-#define FREQ_TABLE_SIZE 	14
+#define FREQ_TABLE_SIZE 	18
 #define DVFS_BOOT_TIME	(30 * HZ)
 #define SHARK_TDPLL_FREQUENCY	(768000)
 #define TRANSITION_LATENCY	(100 * 1000) /* ns */
@@ -232,20 +232,28 @@ static struct cpufreq_table_data sc8830t_cpufreq_table_data_es = {
 #else
 static struct cpufreq_table_data sc8830t_cpufreq_table_data_es_1300 = {
 	.freq_tbl = {
-		{0, 1560000},
-		{1, 1500000},
-		{2, 1400000},
-		{3, 1300000},
-		{4, 1200000},
-		{5, 1000000},
-		{6, SHARK_TDPLL_FREQUENCY},
-		{7, 500000},
-		{8, 400000},
-		{9, 300000},
-		{10, 200000},
-		{1, CPUFREQ_TABLE_END},
+		{0, 1800000},
+		{1, 1750000},
+		{2, 1700000},
+		{3, 1600000},
+		{4, 1560000},
+		{5, 1500000},
+		{6, 1400000},
+		{7, 1300000},
+		{8, 1200000},
+		{9, 1000000},
+		{10, SHARK_TDPLL_FREQUENCY},
+		{11, 500000},
+		{12, 400000},
+		{13, 300000},
+		{14, 200000},
+		{15, CPUFREQ_TABLE_END},
 	},
 	.vddarm_mv = {
+		1250000,
+		1225000,
+		1200000,
+		1150000,
 		1125000,
 		1075000,
 		1075000,
@@ -319,7 +327,7 @@ static void sprd_raw_set_cpufreq(int cpu, struct cpufreq_freqs *freq, int index)
 
 #define CPUFREQ_SET_VOLTAGE() \
 	do { \
-	    ret = regulator_set_voltage(sprd_cpufreq_conf->regulator, \
+		ret = regulator_set_voltage(sprd_cpufreq_conf->regulator, \
 			sprd_cpufreq_conf->vddarm_mv[index], \
 			sprd_cpufreq_conf->vddarm_mv[index]); \
 		if (ret) \
