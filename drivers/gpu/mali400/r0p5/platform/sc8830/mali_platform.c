@@ -49,29 +49,29 @@
 #define GPU_HARDWARE_MAX_DIVISION	4
 
 #ifdef CONFIG_ARCH_SCX30G
-/*tshark 28nm*/
-#define DFS_FREQ_NUM			8
+/*tshark 28nm - Overclocked Limits*/
+#define DFS_FREQ_NUM			9
+
+#define GPU_MAX_FREQ			600000
+#define GPU_MIN_FREQ			64000
+
+#define GPU_150M_FREQ_INDEX 	6
+#elif defined (CONFIG_ARCH_SCX35L)
+/*sharkl 28nm - Overclocked Limits*/
+#define DFS_FREQ_NUM			9
+
+#define GPU_MAX_FREQ			600000
+#define GPU_MIN_FREQ			64000
+
+#define GPU_150M_FREQ_INDEX 	6
+#else
+/*shark 40nm - Overclocked Limits*/
+#define DFS_FREQ_NUM			7
 
 #define GPU_MAX_FREQ			460800
 #define GPU_MIN_FREQ			64000
 
-#define GPU_150M_FREQ_INDEX 	5
-#elif defined (CONFIG_ARCH_SCX35L)
-/*sharkl 28nm*/
-#define DFS_FREQ_NUM			8
-
-#define GPU_MAX_FREQ			512000
-#define GPU_MIN_FREQ			64000
-
-#define GPU_150M_FREQ_INDEX 	5
-#else
-/*shark 40nm*/
-#define DFS_FREQ_NUM			6
-
-#define GPU_MAX_FREQ			312000
-#define GPU_MIN_FREQ			64000
-
-#define GPU_150M_FREQ_INDEX 	3
+#define GPU_150M_FREQ_INDEX 	4
 #endif
 
 #define __SPRD_GPU_TIMEOUT      (3*1000)
@@ -126,9 +126,15 @@ struct gpu_dfs_context {
 DEFINE_SEMAPHORE(gpu_dfs_sem);
 
 #ifdef CONFIG_ARCH_SCX30G
-/*tshark 28nm*/
+/*tshark 28nm - Custom GPU Clock Sources*/
 static struct gpu_clock_source  gpu_clk_src[]=
 {
+	{
+		.name="clk_600m",
+		.freq=600000,
+		.freq_select=7,
+		.clk_src=NULL,
+	},
 	{
 		.name="clk_460m8",
 		.freq=460800,
@@ -167,9 +173,15 @@ static struct gpu_clock_source  gpu_clk_src[]=
 	},
 };
 #elif defined (CONFIG_ARCH_SCX35L)
-/*sharkl 28nm*/
+/*sharkl 28nm - Custom GPU Clock Sources*/
 static struct gpu_clock_source  gpu_clk_src[]=
 {
+	{
+		.name="clk_600m",
+		.freq=600000,
+		.freq_select=6,
+		.clk_src=NULL,
+	},
 	{
 		.name="clk_512m",
 		.freq=512000,
@@ -208,9 +220,15 @@ static struct gpu_clock_source  gpu_clk_src[]=
 	},
 };
 #else
-/*shark 40nm*/
+/*shark 40nm - Custom GPU Clock Sources*/
 static struct gpu_clock_source  gpu_clk_src[]=
 {
+	{
+		.name="clk_460m8",
+		.freq=460800,
+		.freq_select=4,
+		.clk_src=NULL,
+	},
 	{
 		.name="clk_312m",
 		.freq=312000,
@@ -244,63 +262,69 @@ static struct gpu_dfs_context gpu_dfs_ctx=
 	.gpu_suspended=0,
 
 #ifdef CONFIG_ARCH_SCX30G
-/*tshark 28nm*/
+/*tshark 28nm - Overclocked Active Table*/
 	.dfs_freq_list=
 	{
-		/*index:  0 freq:460800 freq_select:  6  div_select:  1*/
+		/*index:  0 freq:600000 freq_select:  7  div_select:  1*/
 		&dfs_freq_full_list[0],
-		/*index:  1 freq:384000 freq_select:  5  div_select:  1*/
+		/*index:  1 freq:460800 freq_select:  6  div_select:  1*/
 		&dfs_freq_full_list[4],
-		/*index:  2 freq:312000 freq_select:  4  div_select:  1*/
+		/*index:  2 freq:384000 freq_select:  5  div_select:  1*/
 		&dfs_freq_full_list[8],
-		/*index:  3 freq:256000 freq_select:  2  div_select:  1*/
+		/*index:  3 freq:312000 freq_select:  4  div_select:  1*/
 		&dfs_freq_full_list[12],
-		/*index:  4 freq:208000 freq_select:  1  div_select:  1*/
+		/*index:  4 freq:256000 freq_select:  2  div_select:  1*/
 		&dfs_freq_full_list[16],
-		/*index:  5 freq:153600 freq_select:  0  div_select:  1*/
+		/*index:  5 freq:208000 freq_select:  1  div_select:  1*/
 		&dfs_freq_full_list[20],
-		/*index:  6 freq:104000 freq_select:  1  div_select:  2*/
-		&dfs_freq_full_list[17],
-		/*index:  7 freq:64000  freq_select:  2  div_select:  4*/
-		&dfs_freq_full_list[15],
+		/*index:  6 freq:153600 freq_select:  0  div_select:  1*/
+		&dfs_freq_full_list[24],
+		/*index:  7 freq:104000 freq_select:  1  div_select:  2*/
+		&dfs_freq_full_list[21],
+		/*index:  8 freq:64000  freq_select:  2  div_select:  4*/
+		&dfs_freq_full_list[19],
 	},
 #elif defined (CONFIG_ARCH_SCX35L)
-/*sharkl 28nm*/
+/*sharkl 28nm - Overclocked Active Table*/
 	.dfs_freq_list=
 	{
-		/*index:  0 freq:512000 freq_select:  5  div_select:  1*/
+		/*index:  0 freq:600000 freq_select:  6  div_select:  1*/
 		&dfs_freq_full_list[0],
-		/*index:  1 freq:384000 freq_select:  4  div_select:  1*/
+		/*index:  1 freq:512000 freq_select:  5  div_select:  1*/
 		&dfs_freq_full_list[4],
-		/*index:  2 freq:307200 freq_select:  3  div_select:  1*/
+		/*index:  2 freq:384000 freq_select:  4  div_select:  1*/
 		&dfs_freq_full_list[8],
-		/*index:  3 freq:256000 freq_select:  2  div_select:  1*/
+		/*index:  3 freq:307200 freq_select:  3  div_select:  1*/
 		&dfs_freq_full_list[12],
-		/*index:  4 freq:192000 freq_select:  1  div_select:  1*/
+		/*index:  4 freq:256000 freq_select:  2  div_select:  1*/
 		&dfs_freq_full_list[16],
-		/*index:  5 freq:153600 freq_select:  0  div_select:  1*/
+		/*index:  5 freq:192000 freq_select:  1  div_select:  1*/
 		&dfs_freq_full_list[20],
-		/*index:  6 freq:102400 freq_select:  3  div_select:  3*/
-		&dfs_freq_full_list[10],
-		/*index:  7 freq:64000  freq_select:  2  div_select:  4*/
-		&dfs_freq_full_list[15],
+		/*index:  6 freq:153600 freq_select:  0  div_select:  1*/
+		&dfs_freq_full_list[24],
+		/*index:  7 freq:102400 freq_select:  3  div_select:  3*/
+		&dfs_freq_full_list[14],
+		/*index:  8 freq:64000  freq_select:  2  div_select:  4*/
+		&dfs_freq_full_list[19],
 	},
 #else
-/*shark 40nm*/
+/*shark 40nm - Overclocked Active Table*/
 	.dfs_freq_list=
 	{
-		/*index:  0 freq:312000 freq_select:  3  div_select:  1 up:280800  down:218400*/
+		/*index:  0 freq:460800 freq_select:  4  div_select:  1*/
 		&dfs_freq_full_list[0],
-		/*index:  1 freq:256000 freq_select:  1  div_select:  1 up:230400  down:179200*/
+		/*index:  1 freq:312000 freq_select:  3  div_select:  1*/
 		&dfs_freq_full_list[4],
-		/*index:  2 freq:208000 freq_select:  0  div_select:  1 up:187200  down:145600*/
+		/*index:  2 freq:256000 freq_select:  1  div_select:  1*/
 		&dfs_freq_full_list[8],
-		/*index:  3 freq:156000 freq_select:  3  div_select:  2 up:140400  down:109200*/
-		&dfs_freq_full_list[1],
-		/*index:  4 freq:104000 freq_select:  0  div_select:  2 up: 93600  down: 72800*/
-		&dfs_freq_full_list[9],
-		/*index:  5 freq: 64000 freq_select:  1  div_select:  4 up: 57600  down: 44800*/
-		&dfs_freq_full_list[7],
+		/*index:  3 freq:208000 freq_select:  0  div_select:  1*/
+		&dfs_freq_full_list[12],
+		/*index:  4 freq:156000 freq_select:  3  div_select:  2*/
+		&dfs_freq_full_list[5],
+		/*index:  5 freq:104000 freq_select:  0  div_select:  2*/
+		&dfs_freq_full_list[13],
+		/*index:  6 freq: 64000 freq_select:  1  div_select:  4*/
+		&dfs_freq_full_list[11],
 	},
 #endif
 	.sem=&gpu_dfs_sem,
@@ -320,7 +344,6 @@ static void gpufreq_table_show(char* buf);
 
 static int sprd_gpu_domain_state(void)
 {
-	/* FIXME: rtc domain */
 	u32 power_state1, power_state2, power_state3;
 	unsigned long timeout = jiffies + msecs_to_jiffies(__SPRD_GPU_TIMEOUT);
 
@@ -402,78 +425,7 @@ static void gpu_dfs_full_list_generate(void)
 {
 	int i=0,j=0;
 
-/*
-	frequency list for tshark 40nm:
-	index:  0 freq:312000 freq_select:  3  div_select:  1 up:280800  down:218400
-	index:  1 freq:156000 freq_select:  3  div_select:  2 up:140400  down:109200
-	index:  2 freq:104000 freq_select:  3  div_select:  3 up: 93600  down: 72800
-	index:  3 freq: 78000 freq_select:  3  div_select:  4 up: 70200  down: 54600
-	index:  4 freq:256000 freq_select:  1  div_select:  1 up:230400  down:179200
-	index:  5 freq:128000 freq_select:  1  div_select:  2 up:115200  down: 89600
-	index:  6 freq: 85333 freq_select:  1  div_select:  3 up: 76800  down: 59733
-	index:  7 freq: 64000 freq_select:  1  div_select:  4 up: 57600  down: 44800
-	index:  8 freq:208000 freq_select:  0  div_select:  1 up:187200  down:145600
-	index:  9 freq:104000 freq_select:  0  div_select:  2 up: 93600  down: 72800
-	index: 10 freq: 69333 freq_select:  0  div_select:  3 up: 62400  down: 48533
-	index: 11 freq: 52000 freq_select:  0  div_select:  4 up: 46800  down: 36400
-*/
-
-/*
-	frequency list for tshark 28nm:
-	index:  0 freq:460800 freq_select:  6  div_select:  1 up:414720  down:     0
-	index:  1 freq:230400 freq_select:  6  div_select:  2 up:207360  down:     0
-	index:  2 freq:153600 freq_select:  6  div_select:  3 up:138240  down:     0
-	index:  3 freq:115200 freq_select:  6  div_select:  4 up:103680  down:     0
-	index:  4 freq:384000 freq_select:  5  div_select:  1 up:345600  down:     0
-	index:  5 freq:192000 freq_select:  5  div_select:  2 up:172800  down:     0
-	index:  6 freq:128000 freq_select:  5  div_select:  3 up:115200  down:     0
-	index:  7 freq: 96000 freq_select:  5  div_select:  4 up: 86400  down:     0
-	index:  8 freq:312000 freq_select:  4  div_select:  1 up:280800  down:     0
-	index:  9 freq:156000 freq_select:  4  div_select:  2 up:140400  down:     0
-	index: 10 freq:104000 freq_select:  4  div_select:  3 up: 93600  down:     0
-	index: 11 freq: 78000 freq_select:  4  div_select:  4 up: 70200  down:     0
-	index: 12 freq:256000 freq_select:  2  div_select:  1 up:230400  down:     0
-	index: 13 freq:128000 freq_select:  2  div_select:  2 up:115200  down:     0
-	index: 14 freq: 85333 freq_select:  2  div_select:  3 up: 76800  down:     0
-	index: 15 freq: 64000 freq_select:  2  div_select:  4 up: 57600  down:     0
-	index: 16 freq:208000 freq_select:  1  div_select:  1 up:187200  down:     0
-	index: 17 freq:104000 freq_select:  1  div_select:  2 up: 93600  down:     0
-	index: 18 freq: 69333 freq_select:  1  div_select:  3 up: 62400  down:     0
-	index: 19 freq: 52000 freq_select:  1  div_select:  4 up: 46800  down:     0
-	index: 20 freq:153600 freq_select:  0  div_select:  1 up:138240  down:     0
-	index: 21 freq: 76800 freq_select:  0  div_select:  2 up: 69120  down:     0
-	index: 22 freq: 51200 freq_select:  0  div_select:  3 up: 46080  down:     0
-	index: 23 freq: 38400 freq_select:  0  div_select:  4 up: 34560  down:     0
-*/
-
-/* sharkl 28nm
-	index:  0 freq:512000 freq_select:  5  div_select:  1 up:460800  down:     0
-	index:  1 freq:256000 freq_select:  5  div_select:  2 up:230400  down:     0
-	index:  2 freq:170666 freq_select:  5  div_select:  3 up:153600  down:     0
-	index:  3 freq:128000 freq_select:  5  div_select:  4 up:115200  down:     0
-	index:  4 freq:384000 freq_select:  4  div_select:  1 up:345600  down:     0
-	index:  5 freq:192000 freq_select:  4  div_select:  2 up:172800  down:     0
-	index:  6 freq:128000 freq_select:  4  div_select:  3 up:115200  down:     0
-	index:  7 freq: 96000 freq_select:  4  div_select:  4 up: 86400  down:     0
-	index:  8 freq:307200 freq_select:  3  div_select:  1 up:276480  down:     0
-	index:  9 freq:153600 freq_select:  3  div_select:  2 up:138240  down:     0
-	index: 10 freq:102400 freq_select:  3  div_select:  3 up: 92160  down:     0
-	index: 11 freq: 76800 freq_select:  3  div_select:  4 up: 69120  down:     0
-	index: 12 freq:256000 freq_select:  2  div_select:  1 up:230400  down:     0
-	index: 13 freq:128000 freq_select:  2  div_select:  2 up:115200  down:     0
-	index: 14 freq: 85333 freq_select:  2  div_select:  3 up: 76800  down:     0
-	index: 15 freq: 64000 freq_select:  2  div_select:  4 up: 57600  down:     0
-	index: 16 freq:192000 freq_select:  1  div_select:  1 up:172800  down:     0
-	index: 17 freq: 96000 freq_select:  1  div_select:  2 up: 86400  down:     0
-	index: 18 freq: 64000 freq_select:  1  div_select:  3 up: 57600  down:     0
-	index: 19 freq: 48000 freq_select:  1  div_select:  4 up: 43200  down:     0
-	index: 20 freq:153600 freq_select:  0  div_select:  1 up:138240  down:     0
-	index: 21 freq: 76800 freq_select:  0  div_select:  2 up: 69120  down:     0
-	index: 22 freq: 51200 freq_select:  0  div_select:  3 up: 46080  down:     0
-	index: 23 freq: 38400 freq_select:  0  div_select:  4 up: 34560  down:     0
-*/
-
-    for(i=0;i<gpu_clk_num;i++)
+	for(i=0;i<gpu_clk_num;i++)
 	{
 		for(j=0;j<GPU_HARDWARE_MAX_DIVISION;j++)
 		{
@@ -486,13 +438,13 @@ static void gpu_dfs_full_list_generate(void)
 		}
 	}
 
-    for(i=0;i<gpu_clk_num*GPU_HARDWARE_MAX_DIVISION;i++)
-    {
+	for(i=0;i<gpu_clk_num*GPU_HARDWARE_MAX_DIVISION;i++)
+	{
 		MALI_DEBUG_PRINT(3,("full list index:%3d freq:%6d freq_select:%3d  div_select:%3d up:%6d  down:%6d\n",
 			dfs_freq_full_list[i].index,dfs_freq_full_list[i].freq,
 			dfs_freq_full_list[i].freq_select, dfs_freq_full_list[i].div_select,
 			dfs_freq_full_list[i].up_threshold,dfs_freq_full_list[i].down_threshold));
-    }
+	}
 }
 
 static void gpu_dfs_context_init(void)
@@ -505,7 +457,7 @@ static void gpu_dfs_context_init(void)
 	{
 		gpu_dfs_ctx.dfs_freq_list[i]->index=i;
 		MALI_DEBUG_PRINT(2,("index:%3d freq:%6d freq_select:%3d  div_select:%3d up:%6d  down:%6d\n",
-        gpu_dfs_ctx.dfs_freq_list[i]->index,gpu_dfs_ctx.dfs_freq_list[i]->freq,
+		gpu_dfs_ctx.dfs_freq_list[i]->index,gpu_dfs_ctx.dfs_freq_list[i]->freq,
 		gpu_dfs_ctx.dfs_freq_list[i]->freq_select, gpu_dfs_ctx.dfs_freq_list[i]->div_select,
 		gpu_dfs_ctx.dfs_freq_list[i]->up_threshold,gpu_dfs_ctx.dfs_freq_list[i]->down_threshold));
 	}
@@ -573,7 +525,7 @@ static struct resource mali_gpu_resources[] =
 	MALI_GPU_RESOURCES_MALI400_MP2_PMU(SPRD_MALI_PHYS, IRQ_GPU_INT, IRQ_GPU_INT,
 													IRQ_GPU_INT, IRQ_GPU_INT, IRQ_GPU_INT, IRQ_GPU_INT)
 #else
-    MALI_GPU_RESOURCES_MALI400_MP1_PMU(SPRD_MALI_PHYS, IRQ_GPU_INT, IRQ_GPU_INT, IRQ_GPU_INT, IRQ_GPU_INT)
+	MALI_GPU_RESOURCES_MALI400_MP1_PMU(SPRD_MALI_PHYS, IRQ_GPU_INT, IRQ_GPU_INT, IRQ_GPU_INT, IRQ_GPU_INT)
 #endif
 };
 
@@ -595,7 +547,7 @@ static struct platform_device mali_gpu_device =
 	.dev.release = mali_platform_device_release,
 };
 
-int  mali_power_initialize(struct platform_device *pdev)
+int mali_power_initialize(struct platform_device *pdev)
 {
 	int i=0;
 #ifdef CONFIG_OF
@@ -607,28 +559,10 @@ int  mali_power_initialize(struct platform_device *pdev)
 	}
 	gpu_dfs_ctx.gpu_clock = of_clk_get(np, 1);
 	gpu_dfs_ctx.gpu_clock_i = of_clk_get(np, 0);
-#ifdef CONFIG_ARCH_SCX30G
-/*tshark 28nm*/
-	gpu_clk_src[0].clk_src = of_clk_get(np, 7);
-	gpu_clk_src[1].clk_src = of_clk_get(np, 6);
-	gpu_clk_src[2].clk_src = of_clk_get(np, 5);
-	gpu_clk_src[3].clk_src = of_clk_get(np, 4);
-	gpu_clk_src[4].clk_src = of_clk_get(np, 3);
-	gpu_clk_src[5].clk_src = of_clk_get(np, 2);
-#elif defined (CONFIG_ARCH_SCX35L)
-/*sharkl 28nm*/
-	gpu_clk_src[0].clk_src = of_clk_get(np, 7);
-	gpu_clk_src[1].clk_src = of_clk_get(np, 6);
-	gpu_clk_src[2].clk_src = of_clk_get(np, 5);
-	gpu_clk_src[3].clk_src = of_clk_get(np, 4);
-	gpu_clk_src[4].clk_src = of_clk_get(np, 3);
-	gpu_clk_src[5].clk_src = of_clk_get(np, 2);
-#else
-/*shark 40nm*/
-	gpu_clk_src[0].clk_src = of_clk_get(np, 4);
-	gpu_clk_src[1].clk_src = of_clk_get(np, 3);
-	gpu_clk_src[2].clk_src = of_clk_get(np, 2);
-#endif
+
+	for(i=0; i<gpu_clk_num; i++) {
+		gpu_clk_src[i].clk_src = of_clk_get(np, 2 + i);
+	}
 
 	if (!gpu_dfs_ctx.gpu_clock) {
 		printk ("%s, cant get gpu_clock\n", __FUNCTION__);
@@ -803,7 +737,6 @@ void mali_platform_device_release(struct device *device)
 
 void mali_platform_power_mode_change(int power_mode)
 {
-#if 1
 	int i=0;
 
 	down(gpu_dfs_ctx.sem);
@@ -845,14 +778,11 @@ void mali_platform_power_mode_change(int power_mode)
 
 #ifdef CONFIG_COMMON_CLK
 	#ifdef CONFIG_ARCH_SCX30G
-	/*tshark 28nm*/
-			clk_set_parent(gpu_dfs_ctx.gpu_clock,gpu_clk_src[3].clk_src);
+			clk_set_parent(gpu_dfs_ctx.gpu_clock,gpu_clk_src[4].clk_src);
 	#elif defined (CONFIG_ARCH_SCX35L)
-	/*sharkl 28nm*/
-			clk_set_parent(gpu_dfs_ctx.gpu_clock,gpu_clk_src[3].clk_src);
+			clk_set_parent(gpu_dfs_ctx.gpu_clock,gpu_clk_src[4].clk_src);
 	#else
-	/*shark 40nm*/
-			clk_set_parent(gpu_dfs_ctx.gpu_clock,gpu_clk_src[1].clk_src);
+			clk_set_parent(gpu_dfs_ctx.gpu_clock,gpu_clk_src[2].clk_src);
 	#endif
 #endif
 			clk_set_parent(gpu_dfs_ctx.gpu_clock,gpu_dfs_ctx.dfs_max_freq_p->clk_src);
@@ -962,9 +892,7 @@ void mali_platform_power_mode_change(int power_mode)
 		break;
 	};
 	up(gpu_dfs_ctx.sem);
-#endif
 }
-
 
 static inline void mali_set_div(int clock_div)
 {
@@ -1081,7 +1009,6 @@ void mali_platform_utilization(struct mali_gpu_utilization_data *data)
 			break;
 	}
 
-	// if the loading ratio is greater then 90%, switch the clock to the maximum
 	if(gpu_dfs_ctx.cur_load >= (256*UP_THRESHOLD))
 	{
 		gpu_dfs_ctx.next_freq_p=gpu_dfs_ctx.dfs_max_freq_p;
@@ -1137,49 +1064,9 @@ static void gpufreq_limit_init(void)
 	gpufreq_table=(char*)kzalloc(256*sizeof(char), GFP_KERNEL);
 	gpufreq_table_show(gpufreq_table);
 }
+
 static void gpufreq_limit_uninit(void)
 {
-	kfree(gpufreq_table);
-	return;
-}
-
-static void gpu_change_freq_div(void)
-{
-	down(gpu_dfs_ctx.sem);
-	if(gpu_dfs_ctx.gpu_power_on&&gpu_dfs_ctx.gpu_clock_on)
-	{
-#if !GPU_GLITCH_FREE_DFS
-		mali_dev_pause();
-#endif
-		if(gpu_dfs_ctx.next_freq_p!=gpu_dfs_ctx.cur_freq_p)
-		{
-#ifdef CONFIG_COMMON_CLK
-			clk_disable_unprepare(gpu_dfs_ctx.gpu_clock);
-#else
-			clk_disable(gpu_dfs_ctx.gpu_clock);
-#endif
-			if(gpu_dfs_ctx.next_freq_p->freq_select!=gpu_dfs_ctx.cur_freq_p->freq_select)
-			{
-				MALI_DEBUG_PRINT(3,("GPU_DFS set clk cur_freq %6d-> next_freq %6d next_freq clk_src 0x%p\n",
-					gpu_dfs_ctx.cur_freq_p->freq, gpu_dfs_ctx.next_freq_p->freq,gpu_dfs_ctx.next_freq_p->clk_src));
-				clk_set_parent(gpu_dfs_ctx.gpu_clock,gpu_dfs_ctx.next_freq_p->clk_src);
-			}
-			if(gpu_dfs_ctx.next_freq_p->div_select!=gpu_dfs_ctx.cur_freq_p->div_select)
-			{
-				mali_set_div(gpu_dfs_ctx.next_freq_p->div_select);
-			}
-			gpu_dfs_ctx.cur_freq_p=gpu_dfs_ctx.next_freq_p;
-			gpu_cur_freq=gpu_dfs_ctx.cur_freq_p->freq;
-#ifdef CONFIG_COMMON_CLK
-			clk_prepare_enable(gpu_dfs_ctx.gpu_clock);
-#else
-			clk_enable(gpu_dfs_ctx.gpu_clock);
-#endif
-			udelay(100);
-		}
-#if !GPU_GLITCH_FREE_DFS
-		mali_dev_resume();
-#endif
-	}
-	up(gpu_dfs_ctx.sem);
+	if(gpufreq_table)
+		kfree(gpufreq_table);
 }
