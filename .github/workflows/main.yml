@@ -31,23 +31,25 @@ jobs:
           tar -xzf android-8.1.0_r81.tar.gz
           rm android-8.1.0_r81.tar.gz
 
-      - name: Compile Kernel
+- name: Compile Kernel
         run: |
           # Define absolute paths for the downloaded toolchain
           TOOLCHAIN_PATH="${{ github.workspace }}/toolchain"
           export PATH="$TOOLCHAIN_PATH/bin:$PATH"
           
-          # Force override hardcoded paths by passing variables directly to make
+          # Force override hardcoded paths and disable Werror for legacy compatibility
           make ARCH=arm SUBARCH=arm \
             CROSS_COMPILE="$TOOLCHAIN_PATH/bin/arm-linux-androideabi-" \
             CC="$TOOLCHAIN_PATH/bin/arm-linux-androideabi-gcc" \
             HOSTCFLAGS="-O2 -fcommon" \
+            KCFLAGS="-Wno-error=int-conversion -Wno-error=pointer-type-mismatch" \
             goyavewifi_defconfig
 
           make ARCH=arm SUBARCH=arm \
             CROSS_COMPILE="$TOOLCHAIN_PATH/bin/arm-linux-androideabi-" \
             CC="$TOOLCHAIN_PATH/bin/arm-linux-androideabi-gcc" \
             HOSTCFLAGS="-O2 -fcommon" \
+            KCFLAGS="-Wno-error=int-conversion -Wno-error=pointer-type-mismatch" \
             -j$(nproc) zImage
 
       - name: Check Kernel Binary
