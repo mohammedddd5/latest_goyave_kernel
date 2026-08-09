@@ -23,7 +23,7 @@ jobs:
             libssl-dev dkms libelf-dev libtinfo5 \
             zip unzip git bc lib32z1 lib32ncurses6 python2 python3
 
-      - name: Download and Setup Android 8.1.0 GCC 4.9 Toolchain
+      - name: Download and Setup Toolchain
         run: |
           mkdir -p toolchain
           cd toolchain
@@ -33,18 +33,22 @@ jobs:
 
       - name: Compile Kernel
         run: |
-          export ARCH=arm
-          export SUBARCH=arm
-          export CROSS_COMPILE=$(pwd)/toolchain/bin/arm-linux-androideabi-
-          export CC=${CROSS_COMPILE}gcc
-          export HOSTCFLAGS="-O2 -fcommon"
-          export CFLAGS_MODULE="-fcommon"
+          # Define absolute paths for the downloaded toolchain
+          TOOLCHAIN_PATH="${{ github.workspace }}/toolchain"
+          export PATH="$TOOLCHAIN_PATH/bin:$PATH"
           
-          # Change goyavewifi_defconfig below to goyave3g_defconfig if building for SM-T116
-          make goyavewifi_defconfig
-          
-          # Build zImage and device tree binaries if applicable
-          make -j$(nproc) zImage
+          # Force override hardcoded paths by passing variables directly to make
+          make ARCH=arm SUBARCH=arm \
+            CROSS_COMPILE="$TOOLCHAIN_PATH/bin/arm-linux-androideabi-" \
+            CC="$TOOLCHAIN_PATH/bin/arm-linux-androideabi-gcc" \
+            HOSTCFLAGS="-O2 -fcommon" \
+            goyavewifi_defconfig
+
+          make ARCH=arm SUBARCH=arm \
+            CROSS_COMPILE="$TOOLCHAIN_PATH/bin/arm-linux-androideabi-" \
+            CC="$TOOLCHAIN_PATH/bin/arm-linux-androideabi-gcc" \
+            HOSTCFLAGS="-O2 -fcommon" \
+            -j$(nproc) zImage
 
       - name: Check Kernel Binary
         run: |
