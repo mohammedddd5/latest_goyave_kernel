@@ -1,0 +1,63 @@
+name: Build Android Kernel
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-kernel:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Kernel Source
+        uses: actions/checkout@v4
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential libncurses5-dev gawk flex bison openssl \
+            libssl-dev dkms libelf-dev libtinfo5 \
+            zip unzip git bc lib32z1 lib32ncurses6 python2 python3
+
+      - name: Download Android 8.1.0 GCC 4.9 Toolchain
+        run: |
+          mkdir -p toolchain
+          cd toolchain
+          wget -q https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/+archive/refs/tags/android-8.1.0_r81.tar.gz
+          tar -xzf android-8.1.0_r81.tar.gz
+          rm android-8.1.0_r81.tar.gz
+
+      - name: Compile Kernel
+        run: |
+          export ARCH=arm
+          export SUBARCH=arm
+          export CROSS_COMPILE=$(pwd)/toolchain/bin/arm-linux-androideabi-
+          export CC=${CROSS_COMPILE}gcc
+          export HOSTCFLAGS="-O2 -fcommon"
+          export CFLAGS_MODULE="-fcommon"
+          
+          # Replace with your actual target defconfig file
+          make goyavewifi_defconfig
+          
+          # Build zImage
+          make -j$(nproc) zImage
+
+      - name: Check Kernel Binary
+        run: |
+          if [ -f arch/arm/boot/zImage ]; then
+            echo "Kernel built successfully!"
+            ls -lh arch/arm/boot/zImage
+          else
+            echo "zImage build failed!"
+            exit 1
+          fi
+
+      - name: Upload Kernel Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zImage-android-8.1-oc
+          path: arch/arm/boot/zImage
